@@ -60,7 +60,7 @@
     0%{ top:-2px; }
     100%{ top:100vh; }
   }
-  body > *:not(#bg3d):not(.bg-vignette):not(.scanline){ position:relative; z-index:3; }
+  body > *:not(#bg3d):not(.bg-vignette):not(.scanline):not(.grain):not(#preloader):not(.cursor-dot):not(.cursor-ring){ position:relative; z-index:3; }
   a{color:inherit; text-decoration:none;}
   ::selection{background:var(--amber); color:#0a0c0f;}
 
@@ -418,19 +418,156 @@
     .proj-card:hover, .cert-card:hover{transform:none;}
   }
 
+  section{scroll-margin-top:66px;}
+
+  /* premium finishing touches */
+  ::-webkit-scrollbar{width:10px; height:10px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(var(--amber), var(--cyan)); border-radius:6px; border:2px solid var(--bg);}
+  html{scrollbar-color:var(--amber) var(--bg); scrollbar-width:thin;}
+
+  .grain{
+    position:fixed; inset:0; z-index:2; pointer-events:none; opacity:.035; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ===== PRELOADER ===== */
+  #preloader{
+    position:fixed; inset:0; z-index:1000; background:var(--bg);
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:22px;
+    transition:opacity .6s ease, visibility .6s ease;
+  }
+  #preloader.done{opacity:0; visibility:hidden; pointer-events:none;}
+  .pl-logo{
+    font-family:var(--mono); font-size:15px; letter-spacing:.3em; color:var(--text-dim);
+    text-transform:uppercase;
+  }
+  .pl-logo span{color:var(--amber);}
+  .pl-bar-track{width:260px; height:2px; background:var(--border); border-radius:2px; overflow:hidden;}
+  .pl-bar-fill{width:0%; height:100%; background:linear-gradient(90deg,var(--amber),var(--cyan)); transition:width .25s ease-out; box-shadow:0 0 10px var(--amber);}
+  .pl-pct{font-family:var(--mono); font-size:11px; color:var(--text-faint); letter-spacing:.1em;}
+  .pl-cube{perspective:300px; width:34px; height:34px; margin-bottom:4px;}
+  .pl-cube-inner{
+    position:relative; width:100%; height:100%; transform-style:preserve-3d;
+    animation:pl-spin 2.4s linear infinite;
+  }
+  .pl-cube-face{
+    position:absolute; width:34px; height:34px; border:1px solid var(--amber);
+    background:rgba(255,176,0,.06); box-shadow:0 0 12px rgba(255,176,0,.35);
+  }
+  .pl-cube-face:nth-child(1){transform:translateZ(17px);}
+  .pl-cube-face:nth-child(2){transform:rotateY(180deg) translateZ(17px);}
+  .pl-cube-face:nth-child(3){transform:rotateY(90deg) translateZ(17px);}
+  .pl-cube-face:nth-child(4){transform:rotateY(-90deg) translateZ(17px);}
+  .pl-cube-face:nth-child(5){transform:rotateX(90deg) translateZ(17px);}
+  .pl-cube-face:nth-child(6){transform:rotateX(-90deg) translateZ(17px);}
+  @keyframes pl-spin{
+    0%{ transform:rotateX(0deg) rotateY(0deg); }
+    100%{ transform:rotateX(360deg) rotateY(360deg); }
+  }
+
+  /* ===== CUSTOM CURSOR ===== */
+  .cursor-dot, .cursor-ring{
+    position:fixed; top:0; left:0; z-index:999; pointer-events:none;
+    border-radius:50%; transform:translate(-50%,-50%);
+    will-change:transform;
+  }
+  .cursor-dot{width:5px; height:5px; background:var(--amber); box-shadow:0 0 8px var(--amber);}
+  .cursor-ring{
+    width:34px; height:34px; border:1px solid rgba(255,176,0,.5);
+    transition:width .18s ease, height .18s ease, border-color .18s ease, background .18s ease;
+  }
+  .cursor-ring.hovering{width:54px; height:54px; border-color:var(--cyan); background:rgba(79,214,232,.06);}
+  @media (hover:none), (pointer:coarse){
+    .cursor-dot, .cursor-ring{display:none;}
+  }
+
+  /* ===== HERO LETTER-ASSEMBLY ===== */
+  .hero-assemble{perspective:900px;}
+  .hero-assemble .letter{
+    display:inline-block; will-change:transform, opacity;
+    transition:transform .85s cubic-bezier(.16,.9,.3,1.1), opacity .6s ease;
+  }
+
+  /* ===== MAGNETIC BUTTON ===== */
+  .btn{ will-change:transform; }
+
+  /* ===== 3D floating cube badge (hero accent) ===== */
+  .hero-cube-wrap{
+    position:absolute; top:-26px; right:6px; perspective:700px; z-index:4;
+    display:block;
+  }
+  .hero-cube{
+    position:relative; width:72px; height:72px; transform-style:preserve-3d;
+    animation:hero-cube-spin 10s linear infinite, hero-cube-bob 4s ease-in-out infinite;
+  }
+  .hero-cube-face{
+    position:absolute; width:72px; height:72px;
+    border:1px solid rgba(255,176,0,.5);
+    background:rgba(18,22,27,.55); backdrop-filter:blur(2px);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:10.5px; font-weight:700; letter-spacing:.05em;
+    color:var(--amber); box-shadow:inset 0 0 20px rgba(255,176,0,.08);
+  }
+  .hero-cube-face.cyan{border-color:rgba(79,214,232,.5); color:var(--cyan); box-shadow:inset 0 0 20px rgba(79,214,232,.08);}
+  .hero-cube-face:nth-child(1){transform:translateZ(36px);}
+  .hero-cube-face:nth-child(2){transform:rotateY(180deg) translateZ(36px);}
+  .hero-cube-face:nth-child(3){transform:rotateY(90deg) translateZ(36px);}
+  .hero-cube-face:nth-child(4){transform:rotateY(-90deg) translateZ(36px);}
+  .hero-cube-face:nth-child(5){transform:rotateX(90deg) translateZ(36px);}
+  .hero-cube-face:nth-child(6){transform:rotateX(-90deg) translateZ(36px);}
+  @keyframes hero-cube-spin{
+    0%{ transform:rotateX(0deg) rotateY(0deg); }
+    100%{ transform:rotateX(360deg) rotateY(360deg); }
+  }
+  @keyframes hero-cube-bob{
+    0%,100%{ margin-top:0px; } 50%{ margin-top:-14px; }
+  }
+  @media (max-width:860px){ .hero-cube-wrap{display:none;} }
+
+  /* ===== staggered card entrance ===== */
+  .proj-grid .proj-card.reveal:nth-child(1){transition-delay:0s;}
+  .proj-grid .proj-card.reveal:nth-child(2){transition-delay:.08s;}
+  .proj-grid .proj-card.reveal:nth-child(3){transition-delay:.16s;}
+  .bug-grid .bug-card.reveal:nth-child(1){transition-delay:0s;}
+  .bug-grid .bug-card.reveal:nth-child(2){transition-delay:.08s;}
+  .bug-grid .bug-card.reveal:nth-child(3){transition-delay:.16s;}
+  .bug-grid .bug-card.reveal:nth-child(4){transition-delay:.24s;}
+  .cert-grid .cert-card.reveal:nth-child(1){transition-delay:0s;}
+  .cert-grid .cert-card.reveal:nth-child(2){transition-delay:.08s;}
+  .cert-grid .cert-card.reveal:nth-child(3){transition-delay:.16s;}
+  .cert-grid .cert-card.reveal:nth-child(4){transition-delay:.24s;}
+
   @media (prefers-reduced-motion:reduce){
     .terminal{animation:none;}
     .flip-inner{animation:none;}
     .scanline{animation:none; display:none;}
     html{scroll-behavior:auto;}
+    #preloader{display:none;}
+    .cursor-dot, .cursor-ring{display:none;}
+    .hero-cube{animation:none;}
   }
 </style>
 </head>
 <body>
 
+<div id="preloader">
+  <div class="pl-cube"><div class="pl-cube-inner">
+    <div class="pl-cube-face"></div><div class="pl-cube-face"></div><div class="pl-cube-face"></div>
+    <div class="pl-cube-face"></div><div class="pl-cube-face"></div><div class="pl-cube-face"></div>
+  </div></div>
+  <div class="pl-logo">SP<span>::</span>VAPT — INITIALIZING</div>
+  <div class="pl-bar-track"><div class="pl-bar-fill" id="plBar"></div></div>
+  <div class="pl-pct" id="plPct">0%</div>
+</div>
+
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
 <canvas id="bg3d"></canvas>
 <div class="bg-vignette"></div>
 <div class="scanline"></div>
+<div class="grain"></div>
 
 <nav>
   <div class="nav-inner">
@@ -462,7 +599,7 @@
   <div class="wrap hero-grid">
     <div>
       <div class="kicker">root@portfolio <span class="amber">~</span> Manaparai, Tiruchirappalli, TN, India</div>
-      <h1 class="title">Siva Prasath L —<br>breaking systems, <em>ethically</em>.</h1>
+      <h1 class="title hero-assemble" id="heroTitle">Siva Prasath L —<br>breaking systems, <em>ethically</em>.</h1>
       <div class="role-line">&gt; VAPT Practitioner // Aspiring Bug Bounty Hunter // 
         Red Teamer</div>
       <p class="lede">Cybersecurity engineering student building hands-on penetration testing skills, automation tooling, and AI-assisted investigation systems — with Kali Linux, Metasploit, Burp Suite and Python as daily drivers.</p>
@@ -471,12 +608,24 @@
         <a class="btn btn-ghost" href="https://github.com/sivaprasathl57-ctrl" target="_blank" rel="noopener">GitHub Profile</a>
       </div>
     </div>
-    <div class="terminal">
-      <div class="terminal-bar">
-        <span class="r"></span><span class="y"></span><span class="g"></span>
-        <div class="title">siva@kali: ~</div>
+    <div style="position:relative;">
+      <div class="hero-cube-wrap">
+        <div class="hero-cube">
+          <div class="hero-cube-face">VAPT</div>
+          <div class="hero-cube-face cyan">0-DAY</div>
+          <div class="hero-cube-face">RECON</div>
+          <div class="hero-cube-face cyan">EXPLOIT</div>
+          <div class="hero-cube-face">PATCH</div>
+          <div class="hero-cube-face cyan">SECURE</div>
+        </div>
       </div>
-      <div class="terminal-body" id="termBody"></div>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="r"></span><span class="y"></span><span class="g"></span>
+          <div class="title">siva@kali: ~</div>
+        </div>
+        <div class="terminal-body" id="termBody"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -555,7 +704,7 @@
       <div class="proj-card reveal">
         <div>
           <div class="proj-id">VAPT-2026-001 // AI &amp; INVESTIGATION</div>
-          <div class="proj-title">NEUROVEIL — AI-Powered Cyber Investigation Platform</div>
+          <div class="proj-title">NEUROVEIL — AI-Powered Cyber Crime Investigation Platform</div>
           <ul class="proj-desc">
             <li>Analyzes cybercrime complaints, traces fraudulent transactions, and generates actionable investigation intelligence.</li>
             <li>Graph-based fraud analysis and evidence correlation to surface scam networks, linked accounts, and suspicious devices.</li>
@@ -844,7 +993,7 @@
       setTimeout(typeLine, 380);
     }
   }
-  typeLine();
+  window.startTerminal = typeLine;
 
   // gauges animate on view
   const gauges = document.querySelectorAll('.gauge-fill');
@@ -915,6 +1064,18 @@
     ring2.rotation.y = Math.PI/5;
     ringGroup.add(ring2);
 
+    // -- radar pulse rings: periodic expanding scan rings from the core --
+    const pulseRings = [];
+    for(let i=0;i<3;i++){
+      const pr = new THREE.Mesh(
+        new THREE.RingGeometry(14.8, 15, 64),
+        new THREE.MeshBasicMaterial({color:0xffb000, transparent:true, opacity:0, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false})
+      );
+      pr.userData.phase = i / 3;
+      group.add(pr);
+      pulseRings.push(pr);
+    }
+
     // -- floating particle field (fewer on small/touch devices for smooth perf) --
     const COUNT = isSmall ? 70 : 130;
     const positions = new Float32Array(COUNT*3);
@@ -930,7 +1091,7 @@
     }
     const particleGeo = new THREE.BufferGeometry();
     particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const particleMat = new THREE.PointsMaterial({color:0xffc233, size:0.9, transparent:true, opacity:0.75});
+    const particleMat = new THREE.PointsMaterial({color:0xffc233, size:0.9, transparent:true, opacity:0.85, blending:THREE.AdditiveBlending, depthWrite:false});
     const particles = new THREE.Points(particleGeo, particleMat);
     group.add(particles);
 
@@ -939,7 +1100,7 @@
     const maxLines = COUNT*4;
     const linePositions = new Float32Array(maxLines*2*3);
     lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
-    const lineMat = new THREE.LineBasicMaterial({color:0x4fd6e8, transparent:true, opacity:0.14});
+    const lineMat = new THREE.LineBasicMaterial({color:0x4fd6e8, transparent:true, opacity:0.22, blending:THREE.AdditiveBlending, depthWrite:false});
     const lines = new THREE.LineSegments(lineGeo, lineMat);
     group.add(lines);
 
@@ -973,11 +1134,15 @@
 
     // scroll-reactive spin: scrolling further down speeds the core up slightly
     let scrollSpeed = 0;
+    let scrollFrac = 0;
     window.addEventListener('scroll', ()=>{
-      scrollSpeed = Math.min(document.documentElement.scrollTop / (document.body.scrollHeight - window.innerHeight || 1), 1);
+      const maxScroll = (document.body.scrollHeight - window.innerHeight) || 1;
+      scrollFrac = Math.min(document.documentElement.scrollTop / maxScroll, 1);
+      scrollSpeed = scrollFrac;
     });
 
     let t = 0;
+    let camZ = 62;
     function animate(){
       t += 0.0035;
       const spinBoost = 1 + scrollSpeed*2.2;
@@ -988,6 +1153,12 @@
       ringGroup.rotation.z += 0.0013*spinBoost;
       ringGroup.rotation.y += 0.0006*spinBoost;
 
+      // depth dolly: camera drifts closer then further as the page scrolls, adding parallax depth
+      const targetZ = 62 - Math.sin(scrollFrac * Math.PI) * 16;
+      camZ += (targetZ - camZ) * 0.03;
+      camera.position.z = camZ;
+      group.rotation.z += (scrollFrac*0.25 - group.rotation.z) * 0.01;
+
       const pos = particleGeo.attributes.position.array;
       for(let i=0;i<COUNT;i++){
         pos[i*3+1] += Math.sin(t*speeds[i]+i)*0.01;
@@ -995,6 +1166,15 @@
       }
       particleGeo.attributes.position.needsUpdate = true;
       if(Math.floor(t*100)%3===0) updateLines();
+
+      const cycle = 3.2;
+      pulseRings.forEach(pr=>{
+        const local = ((t*0.6 + pr.userData.phase*cycle) % cycle) / cycle;
+        const scale = 1 + local*2.4;
+        pr.scale.set(scale, scale, scale);
+        pr.material.opacity = (1-local) * 0.22;
+        pr.rotation.x = Math.PI/2.3;
+      });
 
       group.rotation.y += 0.0009;
       camera.position.x += (mouseX*8 - camera.position.x)*0.02;
@@ -1043,6 +1223,130 @@
     });
     menu.querySelectorAll('a').forEach(a=> a.addEventListener('click', close));
     window.addEventListener('resize', ()=>{ if(window.innerWidth>860) close(); });
+  })();
+
+  // ===== HERO TITLE — letters assemble into place from scattered 3D space =====
+  window.assembleHeroTitle = function(){
+    const el = document.getElementById('heroTitle');
+    if(!el || el.dataset.assembled) return;
+    el.dataset.assembled = '1';
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduceMotion) return;
+
+    const walk = (node)=>{
+      const nodes = Array.from(node.childNodes);
+      nodes.forEach(child=>{
+        if(child.nodeType === 3 && child.textContent.length){
+          const frag = document.createDocumentFragment();
+          child.textContent.split('').forEach(ch=>{
+            const span = document.createElement('span');
+            span.className = 'letter';
+            span.textContent = ch === ' ' ? '\u00A0' : ch;
+            frag.appendChild(span);
+          });
+          child.replaceWith(frag);
+        } else if(child.nodeType === 1){
+          walk(child);
+        }
+      });
+    };
+    walk(el);
+
+    const letters = el.querySelectorAll('.letter');
+    letters.forEach(span=>{
+      const tx = (Math.random()-0.5) * 500;
+      const ty = (Math.random()-0.5) * 320;
+      const tz = -260 - Math.random()*260;
+      const rx = (Math.random()-0.5) * 220;
+      const ry = (Math.random()-0.5) * 220;
+      span.style.opacity = '0';
+      span.style.transform = `translate3d(${tx}px, ${ty}px, ${tz}px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    });
+
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        letters.forEach((span, i)=>{
+          setTimeout(()=>{
+            span.style.opacity = '1';
+            span.style.transform = 'translate3d(0,0,0) rotateX(0deg) rotateY(0deg)';
+          }, i * 26);
+        });
+      });
+    });
+  };
+
+  // ===== PRELOADER: simulated boot progress, then reveal site =====
+  (function initPreloader(){
+    const pre = document.getElementById('preloader');
+    const bar = document.getElementById('plBar');
+    const pct = document.getElementById('plPct');
+    function reveal(){
+      if(window.startTerminal) window.startTerminal();
+      if(window.assembleHeroTitle) window.assembleHeroTitle();
+    }
+    if(!pre){ reveal(); return; }
+    let p = 0;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function tick(){
+      p += reduceMotion ? 100 : (Math.random()*14 + 6);
+      if(p >= 100){
+        p = 100;
+        bar.style.width = '100%';
+        pct.textContent = '100%';
+        setTimeout(()=>{
+          pre.classList.add('done');
+          reveal();
+        }, 250);
+        return;
+      }
+      bar.style.width = p + '%';
+      pct.textContent = Math.floor(p) + '%';
+      setTimeout(tick, reduceMotion ? 0 : 120 + Math.random()*160);
+    }
+    tick();
+    // safety net: never block the site for more than 3.2s
+    setTimeout(()=>{
+      if(!pre.classList.contains('done')){
+        pre.classList.add('done');
+        reveal();
+      }
+    }, 3200);
+  })();
+
+  // ===== CUSTOM CURSOR =====
+  (function initCursor(){
+    if(window.matchMedia('(hover:none), (pointer:coarse)').matches) return;
+    const dot = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    if(!dot || !ring) return;
+    let mx=innerWidth/2, my=innerHeight/2, rx=mx, ry=my;
+    window.addEventListener('mousemove', (e)=>{
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
+    });
+    (function loop(){
+      rx += (mx-rx)*0.16; ry += (my-ry)*0.16;
+      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+      requestAnimationFrame(loop);
+    })();
+    document.querySelectorAll('a, button, .proj-card, .cert-card, .bug-card').forEach(el=>{
+      el.addEventListener('mouseenter', ()=> ring.classList.add('hovering'));
+      el.addEventListener('mouseleave', ()=> ring.classList.remove('hovering'));
+    });
+  })();
+
+  // ===== MAGNETIC BUTTONS =====
+  (function initMagnetic(){
+    if(window.matchMedia('(hover:none)').matches) return;
+    document.querySelectorAll('.btn').forEach(btn=>{
+      btn.addEventListener('mousemove', (e)=>{
+        const r = btn.getBoundingClientRect();
+        const px = (e.clientX - r.left - r.width/2) * 0.25;
+        const py = (e.clientY - r.top - r.height/2) * 0.35;
+        btn.style.transform = `translate(${px}px, ${py}px)`;
+      });
+      btn.addEventListener('mouseleave', ()=>{ btn.style.transform = 'translate(0,0)'; });
+    });
   })();
 </script>
 
